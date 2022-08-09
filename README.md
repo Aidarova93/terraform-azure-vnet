@@ -45,104 +45,37 @@ Users will be able to clone the project into their locals with git clone command
 
 # Documentation for .tf files
 
-# RESOURCE GROUP + PROVIDER 
-Create a resource group. Configure the Microsoft Azure Provider. 
-Steps: 
-Create Azure_Three_tier application Folder with .gitignore and README.md files
-Under Azure_Three_tier Create a file  provider+rg.tf 
-Use resource "azurerm_resource_group" "example"  to create resource group
-Use resource provider "azurerm" features to create provider resource
-
-```
-# We strongly recommend using the required_providers block to set the
-# Azure Provider source and version being used
-
-
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "=2.91.0"
-    }
-  }
-}
-
-# Configure the Microsoft Azure Provider
-provider "azurerm" {
-  features {}
-}
-
-# Create a resource group
-resource "azurerm_resource_group" "wordpress" {
-  name     = "wordpressResourceGroup"
-  location = var.location
-  tags     = var.tags
-}
-
-
-# Generates a random permutation of alphanumeric characters
-resource "random_string" "fqdn" {
-  length  = 6
-  special = false
-  upper   = false
-  number  = false
-}
-```
-
-
-# VARIABLE.TF  
-In this project we used variables to make our code more dynamic. Create a file variable.tf 
-```
-variable "location" {
-  description = "The location where resources will be created"
-  default     = "East US"
-}
-
-variable "tags" {
-  description = "A map of the tags to use for the resources that are deployed"
-  type        = map(string)
-
-  default = {
-    environment = "Test"
-  }
-}
-
-variable "application_port" {
-  description = "The port that you want to expose to the external load balancer"
-  default     = 80
-}
-
- 
-
 # Vnet 
 Next we created vnet.tf configuration file. Vnet is the Virtual Network which will include subnet that will associated with public ip. 
 
 Steps: 
-Use resource "azurerm_network_security_group" "example" to create the Vnet
+Use resource "azurerm_network_security_group" "Team2" to create the Vnet
 Create vnet.tf file in folder with .gitignore and README.md files 
 
-```
-resource "azurerm_virtual_network" "wordpress" {
-  name                = "wordpress-vnet"
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "Team2" {
+  name     = "my-resources"
+  location = "West Europe"
+}
+
+module "vnet" {
+  source              = "Azure/vnet/azurerm"
+  resource_group_name = azurerm_resource_group.Team2.name
   address_space       = ["10.0.0.0/16"]
-  location            = var.location
-  resource_group_name = azurerm_resource_group.wordpress.name
-  tags                = var.tags
-}
+  subnet_prefixes     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  subnet_names        = ["subnet1", "subnet2", "subnet3"]
 
-resource "azurerm_subnet" "wordpress" {
-  name                 = "wordpress-subnet"
-  resource_group_name  = azurerm_resource_group.wordpress.name
-  virtual_network_name = azurerm_virtual_network.wordpress.name
-  address_prefixes     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-}
+  subnet_service_endpoints = {
+    subnet2 = ["Microsoft.Storage", "Microsoft.Sql"],
+    subnet3 = ["Microsoft.AzureActiveDirectory"]
+  }
 
-resource "azurerm_public_ip" "wordpress" {
-  name                = "wordpress-public-ip"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.wordpress.name
-  allocation_method   = "Static"
-  domain_name_label   = random_string.fqdn.result
-  tags                = var.tags
+  tags = {
+    environment = "DevOps"
+  }
+
+  depends_on = [azurerm_resource_group.Team2]
 }
-```
