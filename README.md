@@ -11,8 +11,7 @@ Use Terraform to provision an Azure virtual machine scale set running Wordpress.
 
 * Login to your Azure Cloud Provider  
 * Select Billing Account under hamburger menu 
-* Create a Billing Account For ex: in this project we created  used Yusuf Acoount billing
-
+* Create a Billing Account
 
 
 ## How to use
@@ -113,25 +112,6 @@ variable "application_port" {
   default     = 80
 }
 
-variable "admin_username" {
-  description = "User name to use as the admin account on the VMs that will be part of the VM Scale Set"
-  default     = "wordpress"
-}
-
-variable "admin_password" {
-  description = "Default password for admin account"
-  default     = "W0rdpr3ss@p4ss"
-}
-
-variable "database_admin_login" {
-  default = "wordpress"
-}
-
-variable "database_admin_password" {
-  default = "w0rdpr3ss@p4ss"
-}
-```
-
  
 
 # Vnet 
@@ -154,7 +134,7 @@ resource "azurerm_subnet" "wordpress" {
   name                 = "wordpress-subnet"
   resource_group_name  = azurerm_resource_group.wordpress.name
   virtual_network_name = azurerm_virtual_network.wordpress.name
-  address_prefixes     = ["10.0.2.0/24"]
+  address_prefixes     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
 }
 
 resource "azurerm_public_ip" "wordpress" {
