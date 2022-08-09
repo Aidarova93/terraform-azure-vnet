@@ -52,6 +52,8 @@ Steps:
 Use resource "azurerm_network_security_group" "Team2" to create the Vnet
 Create vnet.tf file in folder with .gitignore and README.md files 
 
+Vnet
+```
 provider "azurerm" {
   features {}
 }
@@ -79,3 +81,5 @@ module "vnet" {
 
   depends_on = [azurerm_resource_group.Team2]
 }
+
+```
