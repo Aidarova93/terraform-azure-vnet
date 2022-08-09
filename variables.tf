@@ -1,7 +1,6 @@
 variable "location" {
   description = "The location where resources will be created"
-  type        = string
-  default     = ""
+  default     = "East US"
 }
 
 variable "tags" {
@@ -11,4 +10,9 @@ variable "tags" {
   default = {
     environment = "Test"
   }
+}
+
+variable "application_port" {
+  description = "The port that you want to expose to the external load balancer"
+  default     = 80
 }
